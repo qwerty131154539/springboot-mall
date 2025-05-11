@@ -1,7 +1,7 @@
 package com.zn.springbootmall.dao.impl;
 
-import com.zn.springbootmall.constant.ProductCategory;
 import com.zn.springbootmall.dao.ProductDao;
+import com.zn.springbootmall.dto.ProductQueryParams;
 import com.zn.springbootmall.dto.ProductRequest;
 import com.zn.springbootmall.model.Product;
 import com.zn.springbootmall.rowmapper.ProductRowMapper;
@@ -24,20 +24,20 @@ public class ProductDaoImpl implements ProductDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public List<Product> getProducts(ProductCategory category, String search) {
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT product_id, product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date FROM product WHERE 1=1";
 
         Map<String, Object> map = new HashMap<>();
 
-        if (category != null) {
+        if (productQueryParams.getCategory() != null) {
             sql += " AND category = :category"; //上面的 WHERE 1=1 可使這句 AND category = :category 可以直接接在後面
-            map.put("category", category.name()); //使用 Enum 類型要先用 .Name 方法轉成字串才能加到 map 裡
+            map.put("category", productQueryParams.getCategory().name()); //使用 Enum 類型要先用 .Name 方法轉成字串才能加到 map 裡
         }
 
-        if (search != null) {
+        if (productQueryParams.getSearch() != null) {
             sql += " AND product_name LIKE :search"; // LIKE 模糊查詢
-            map.put("search", "%"+ search +"%"); // % 代表任意字符
+            map.put("search", "%"+ productQueryParams.getSearch() +"%"); // % 代表任意字符
         }
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
