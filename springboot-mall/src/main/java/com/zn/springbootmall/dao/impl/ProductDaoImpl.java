@@ -30,15 +30,7 @@ public class ProductDaoImpl implements ProductDao {
         Map<String, Object> map = new HashMap<>();
 
         // 查詢條件
-        if (productQueryParams.getCategory() != null) {
-            sql += " AND category = :category"; //上面的 WHERE 1=1 可使這句 AND category = :category 可以直接接在後面
-            map.put("category", productQueryParams.getCategory().name()); //使用 Enum 類型要先用 .Name 方法轉成字串才能加到 map 裡
-        }
-
-        if (productQueryParams.getSearch() != null) {
-            sql += " AND product_name LIKE :search"; // LIKE 模糊查詢
-            map.put("search", "%"+ productQueryParams.getSearch() +"%"); // % 代表任意字符
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class); // 將 count 的值轉換成 Integer 類型的返回值
 
@@ -53,15 +45,7 @@ public class ProductDaoImpl implements ProductDao {
         Map<String, Object> map = new HashMap<>();
 
         // 查詢條件
-        if (productQueryParams.getCategory() != null) {
-            sql += " AND category = :category"; //上面的 WHERE 1=1 可使這句 AND category = :category 可以直接接在後面
-            map.put("category", productQueryParams.getCategory().name()); //使用 Enum 類型要先用 .Name 方法轉成字串才能加到 map 裡
-        }
-
-        if (productQueryParams.getSearch() != null) {
-            sql += " AND product_name LIKE :search"; // LIKE 模糊查詢
-            map.put("search", "%"+ productQueryParams.getSearch() +"%"); // % 代表任意字符
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         // 排序
         sql += " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
@@ -151,5 +135,20 @@ public class ProductDaoImpl implements ProductDao {
         map.put("productId", productId);
 
         namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    private String addFilteringSql(String sql, Map<String, Object> map, ProductQueryParams productQueryParams) {
+        // 查詢條件
+        if (productQueryParams.getCategory() != null) {
+            sql += " AND category = :category"; //上面的 WHERE 1=1 可使這句 AND category = :category 可以直接接在後面
+            map.put("category", productQueryParams.getCategory().name()); //使用 Enum 類型要先用 .Name 方法轉成字串才能加到 map 裡
+        }
+
+        if (productQueryParams.getSearch() != null) {
+            sql += " AND product_name LIKE :search"; // LIKE 模糊查詢
+            map.put("search", "%"+ productQueryParams.getSearch() +"%"); // % 代表任意字符
+        }
+
+        return sql;
     }
 }
