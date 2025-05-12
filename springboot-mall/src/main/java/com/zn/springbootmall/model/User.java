@@ -9,10 +9,10 @@ public class User {
 
     private int userId;
 
-    @JsonProperty("e_mail")
+    //@JsonProperty("e_mail")
     private String email;
 
-    @JsonIgnore
+    //@JsonIgnore
     private String password;
 
     private Date createdDate;
