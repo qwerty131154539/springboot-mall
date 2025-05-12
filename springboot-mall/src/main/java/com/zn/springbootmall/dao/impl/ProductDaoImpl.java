@@ -30,6 +30,7 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
+        // 查詢條件
         if (productQueryParams.getCategory() != null) {
             sql += " AND category = :category"; //上面的 WHERE 1=1 可使這句 AND category = :category 可以直接接在後面
             map.put("category", productQueryParams.getCategory().name()); //使用 Enum 類型要先用 .Name 方法轉成字串才能加到 map 裡
@@ -40,7 +41,13 @@ public class ProductDaoImpl implements ProductDao {
             map.put("search", "%"+ productQueryParams.getSearch() +"%"); // % 代表任意字符
         }
 
+        // 排序
         sql += " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
+
+        // 分頁
+        sql += " LIMIT :limit OFFSET :offset ";
+        map.put("limit", productQueryParams.getLimit());
+        map.put("offset", productQueryParams.getOffset());
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
